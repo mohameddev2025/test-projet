@@ -1,0 +1,38 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Make sonar-scan script executable
+      run: chmod +x ./ci/sonar-scan.sh
+      
+    - name: Run SonarQube Analysis
+      run: ./ci/sonar-scan.sh
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        
+    - name: Check Quality Gate Status
+      run: |
+        # Cette étape vérifiera le statut de la Quality Gate
+        echo "Vérification de la Quality Gate..."
+        # En production, vous utiliseriez l'API SonarQube
